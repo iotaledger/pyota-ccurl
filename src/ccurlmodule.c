@@ -38,7 +38,7 @@ Curl_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 static void
 _Curl_transform(Curl *self)
 {
-  // Copied from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
+  // Adapted from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
   trit_t scratchpad[STATE_LENGTH];
   int scratchpadIndex = 0;
   int scratchpadIndexSave;
@@ -62,7 +62,7 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
   trit_t incoming_value;
   trit_t *trits;
 
-  static char *kwlist[] = {"trits"};
+  static char *kwlist[] = {"trits", NULL};
 
   // Extract and validate parameters.
   // Based on https://github.com/alfredch/iotaPy-Extension/blob/master/iotaPy.c
@@ -79,7 +79,7 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
   trits = (trit_t*)malloc(incoming_count * sizeof(trit_t));
 
   for (i=0; i < incoming_count; i++) {
-    incoming_item = PySequence_GetItem(incoming, i);
+    incoming_item = PyList_GetItem(incoming, i);
 
     if ((incoming_item == NULL) || ! PyLong_Check(incoming_item)) {
       PyErr_SetString(PyExc_ValueError, "`trits` argument contains non-numeric values.");
@@ -96,7 +96,7 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
   }
 
   // Copy values to state and transform.
-  // Copied from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
+  // Adapted from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
   do {
     memcpy(self->_state, trits+offset, (incoming_count < HASH_LENGTH ? incoming_count : HASH_LENGTH ) * sizeof(trit_t));
     _Curl_transform(self);
@@ -111,8 +111,9 @@ static PyObject*
 Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 {
   PyObject *incoming;
+  int incoming_count, offset=0;
 
-  static char *kwlist[] = {"trits"};
+  static char *kwlist[] = {"trits", NULL};
 
   // Extract and validate parameters.
   if (! PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &incoming))
@@ -123,7 +124,17 @@ Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
     return NULL;
   }
 
-  // @todo Copy values to ``incoming`` and transform.
+  incoming_count = PyObject_Length(incoming);
+
+  // Adapted from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
+  do {
+    for (int i=0; i < (incoming_count < HASH_LENGTH ? incoming_count : HASH_LENGTH ); i++) {
+      PyList_SetItem(incoming, offset+i, PyLong_FromLong(self->_state[(offset+i) * sizeof(trit_t)]));
+    }
+
+    _Curl_transform(self);
+    offset += HASH_LENGTH;
+  } while ((incoming_count -= HASH_LENGTH) > 0);
 
   Py_INCREF(Py_None);
   return Py_None;
