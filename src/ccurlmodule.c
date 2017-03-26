@@ -128,8 +128,11 @@ Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 
   // Adapted from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
   do {
-    for (int i=0; i < (incoming_count < HASH_LENGTH ? incoming_count : HASH_LENGTH ); i++) {
-      PyList_SetItem(incoming, offset+i, PyLong_FromLong(self->_state[(offset+i) * sizeof(trit_t)]));
+    // Can't use ``memcpy`` here because we have to convert ints into ``PyLongObject``.
+    // This isn't the slow part of Curl (that honor is reserved for ``_Curl_transform``),
+    // so it shouldn't be that big of a problem.
+    for (int i=offset; i < (incoming_count < HASH_LENGTH ? incoming_count : HASH_LENGTH ); i++) {
+      PyList_SetItem(incoming, i, PyLong_FromLong(self->_state[i]));
     }
 
     _Curl_transform(self);
