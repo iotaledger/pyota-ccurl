@@ -81,13 +81,13 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
     incoming_item = PyList_GetItem(incoming, i);
 
     if ((incoming_item == NULL) || ! PyLong_Check(incoming_item)) {
-      PyErr_SetString(PyExc_ValueError, "`trits` argument contains non-numeric values.");
+      PyErr_Format(PyExc_ValueError, "`trits` argument contains non-numeric value at index %u.", i);
       return NULL;
     }
 
     incoming_value = (trit_t)PyLong_AsLong(incoming_item);
     if ((incoming_value < -1) || (incoming_value > 1)) {
-      PyErr_SetString(PyExc_ValueError, "`trits` argument contains values outside range [-1, 1].");
+      PyErr_Format(PyExc_ValueError, "`trits` argument contains value outside range [-1, 1] at index %u.", i);
       return NULL;
     }
 
