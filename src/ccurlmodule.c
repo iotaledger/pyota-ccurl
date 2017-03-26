@@ -2,11 +2,20 @@
 #include <stdint.h>
 
 #define HASH_LENGTH 243
+#define NUMBER_OF_ROUNDS 27
 #define STATE_LENGTH 3 * HASH_LENGTH
 
 // 32-bit int uses more memory, but
 // CPUs are often optimized for 32- and 64-bit ints.
 typedef int32_t trit_t;
+
+// Copied from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
+#define __TRUTH_TABLE	\
+   1,  0, -1, \
+   1, -1,  0, \
+  -1,  1,  0
+
+static const trit_t TRUTH_TABLE[9] = {__TRUTH_TABLE};
 
 typedef struct {
   PyObject_HEAD
@@ -26,18 +35,37 @@ Curl_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   return (PyObject*)self;
 }
 
+static void
+_Curl_transform(Curl *self)
+{
+  // Copied from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
+  trit_t scratchpad[STATE_LENGTH];
+  int scratchpadIndex = 0;
+  int scratchpadIndexSave;
+
+  for (int round = 0; round < NUMBER_OF_ROUNDS; round++) {
+    memcpy(scratchpad, self->_state, STATE_LENGTH * sizeof(trit_t));
+
+    for (int stateIndex = 0; stateIndex < STATE_LENGTH; stateIndex++) {
+      scratchpadIndexSave = scratchpadIndex;
+      scratchpadIndex += (scratchpadIndex < 365 ? 364 : -365);
+      self->_state[stateIndex] = TRUTH_TABLE[scratchpad[scratchpadIndexSave ] + scratchpad[scratchpadIndex ] * 3 + 4];
+    }
+  }
+}
+
 static PyObject*
 Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
 {
   PyObject *incoming, *incoming_item;
-  int32_t i, incoming_count;
+  int i, incoming_count, offset=0;
   trit_t incoming_value;
   trit_t *trits;
 
   static char *kwlist[] = {"trits"};
 
   // Extract and validate parameters.
-  // https://github.com/alfredch/iotaPy-Extension/blob/master/iotaPy.c
+  // Based on https://github.com/alfredch/iotaPy-Extension/blob/master/iotaPy.c
   if (! PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &incoming))
     return NULL;
 
@@ -67,7 +95,13 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
     trits[i] = incoming_value;
   }
 
-  // @todo Copy values to state and transform.
+  // Copy values to state and transform.
+  // Copied from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
+  do {
+    memcpy(self->_state, trits+offset, (incoming_count < HASH_LENGTH ? incoming_count : HASH_LENGTH ) * sizeof(trit_t));
+    _Curl_transform(self);
+    offset += HASH_LENGTH;
+  } while ((incoming_count -= HASH_LENGTH) > 0);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -84,7 +118,8 @@ Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 static PyObject*
 Curl_reset(Curl *self)
 {
-  /* Not implemented yet. */
+  memset(self->_state, 0, STATE_LENGTH * sizeof(trit_t));
+
   Py_INCREF(Py_None);
   return Py_None;
 }
