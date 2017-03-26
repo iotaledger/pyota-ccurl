@@ -17,7 +17,7 @@ setup(
   name        = 'PyOTA-CCurl',
   description = 'C Curl extension for PyOTA',
   url         = 'https://github.com/todofixthis/pyota-ccurl',
-  version     = '1.0.0a1',
+  version     = '1.0.0a2',
 
   long_description = long_description,
 
@@ -38,11 +38,11 @@ setup(
     'Programming Language :: Python :: 3.6',
     'Topic :: Software Development :: Libraries :: Python Modules',
   ],
-      
+
   keywords =
     'iota,tangle,iot,internet of things,api,library,cryptocurrency,'
     'balanced ternary',
-      
+
   author        = 'Phoenix Zerin',
   author_email  = 'phx@phx.ph',
 )
