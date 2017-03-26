@@ -40,13 +40,12 @@ _Curl_transform(Curl *self)
 {
   // Adapted from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
   trit_t scratchpad[STATE_LENGTH];
-  int scratchpadIndex = 0;
-  int scratchpadIndexSave;
+  int round, scratchpadIndex=0, scratchpadIndexSave, stateIndex;
 
-  for (int round = 0; round < NUMBER_OF_ROUNDS; round++) {
+  for (round = 0; round < NUMBER_OF_ROUNDS; round++) {
     memcpy(scratchpad, self->_state, STATE_LENGTH * sizeof(trit_t));
 
-    for (int stateIndex = 0; stateIndex < STATE_LENGTH; stateIndex++) {
+    for (stateIndex = 0; stateIndex < STATE_LENGTH; stateIndex++) {
       scratchpadIndexSave = scratchpadIndex;
       scratchpadIndex += (scratchpadIndex < 365 ? 364 : -365);
       self->_state[stateIndex] = TRUTH_TABLE[scratchpad[scratchpadIndexSave ] + scratchpad[scratchpadIndex ] * 3 + 4];
@@ -111,7 +110,7 @@ static PyObject*
 Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 {
   PyObject *incoming;
-  int incoming_count;
+  int i, incoming_count;
 
   static char *kwlist[] = {"trits", NULL};
 
@@ -135,7 +134,7 @@ Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
   // Can't use ``memcpy`` here because we have to convert ints into ``PyLongObject``.
   // This isn't the slow part of Curl (that honor is reserved for ``_Curl_transform``),
   // so it shouldn't be that big of a problem.
-  for (int i=0; i < HASH_LENGTH; i++) {
+  for (i=0; i < HASH_LENGTH; i++) {
     PyList_SetItem(incoming, i, PyLong_FromLong(self->_state[i]));
   }
 
