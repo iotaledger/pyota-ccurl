@@ -69,8 +69,8 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
   if (! PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &incoming))
     return NULL;
 
-  if (! PySequence_Check(incoming)) {
-    PyErr_SetString(PyExc_TypeError, "Expected list of integers.");
+  if (! PyList_Check(incoming)) {
+    PyErr_SetString(PyExc_TypeError, "`trits` argument must be a list.");
     return NULL;
   }
 
@@ -82,13 +82,13 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
     incoming_item = PySequence_GetItem(incoming, i);
 
     if ((incoming_item == NULL) || ! PyLong_Check(incoming_item)) {
-      PyErr_SetString(PyExc_ValueError, "List contains non-numeric values.");
+      PyErr_SetString(PyExc_ValueError, "`trits` argument contains non-numeric values.");
       return NULL;
     }
 
     incoming_value = (trit_t)PyLong_AsLong(incoming_item);
     if ((incoming_value < -1) || (incoming_value > 1)) {
-      PyErr_SetString(PyExc_ValueError, "List contains value outside range [-1, 1].");
+      PyErr_SetString(PyExc_ValueError, "`trits` argument contains values outside range [-1, 1].");
       return NULL;
     }
 
@@ -110,7 +110,21 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
 static PyObject*
 Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 {
-  /* Not implemented yet. */
+  PyObject *incoming;
+
+  static char *kwlist[] = {"trits"};
+
+  // Extract and validate parameters.
+  if (! PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &incoming))
+    return NULL;
+
+  if (! PyList_Check(incoming)) {
+    PyErr_SetString(PyExc_TypeError, "`trits` argument must be a list.");
+    return NULL;
+  }
+
+  // @todo Copy values to ``incoming`` and transform.
+
   Py_INCREF(Py_None);
   return Py_None;
 }
