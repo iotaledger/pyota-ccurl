@@ -25,6 +25,37 @@ Curl_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   return (PyObject*)self;
 }
 
+static PyObject*
+Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
+{
+  /* Not implemented yet. */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject*
+Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
+{
+  /* Not implemented yet. */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject*
+Curl_reset(Curl *self)
+{
+  /* Not implemented yet. */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyMethodDef Curl_methods[] = {
+  {"absorb", (PyCFunction)Curl_absorb, METH_VARARGS|METH_KEYWORDS, "Absorb trits into the sponge."},
+  {"reset", (PyCFunction)Curl_reset, METH_NOARGS, "Resets internal state."},
+  {"squeeze", (PyCFunction)Curl_squeeze, METH_VARARGS|METH_KEYWORDS, "Squeeze trits from the sponge."},
+  {NULL} /* Sentinel */
+};
+
 static PyTypeObject ccurl_CurlType = {
   PyVarObject_HEAD_INIT(NULL, 0)
   "ccurl.Curl",       /* tp_name */
@@ -53,7 +84,7 @@ static PyTypeObject ccurl_CurlType = {
   0,                  /* tp_weaklistoffset */
   0,                  /* tp_iter */
   0,                  /* tp_iternext */
-  0,                  /* tp_methods */
+  Curl_methods,       /* tp_methods */
   0,                  /* tp_members */
   0,                  /* tp_getset */
   0,                  /* tp_base */
