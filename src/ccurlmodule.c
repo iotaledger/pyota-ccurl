@@ -97,7 +97,7 @@ PyInit_ccurl(void)
   PyModule_AddObject(m, "Curl", (PyObject*)&ccurl_CurlType);
 
   Py_INCREF(hash_length);
-  PyModule_AddObject(m, "HASH_LENGTH", (PyObject*)hash_length);
+  PyModule_AddObject(m, "HASH_LENGTH", hash_length);
 
   return m;
 }
