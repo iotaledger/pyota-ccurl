@@ -75,7 +75,7 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
   }
 
   // Check for invalid values in ``incoming``.
-  incoming_count = PyObject_Length(incoming);
+  incoming_count = PyList_Size(incoming);
   trits = (trit_t*)malloc(incoming_count * sizeof(trit_t));
 
   for (i=0; i < incoming_count; i++) {
@@ -111,7 +111,7 @@ static PyObject*
 Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 {
   PyObject *incoming;
-  int incoming_count, offset=0;
+  int incoming_count;
 
   static char *kwlist[] = {"trits", NULL};
 
@@ -124,20 +124,22 @@ Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
     return NULL;
   }
 
-  incoming_count = PyObject_Length(incoming);
+  // Ensure that ``incoming`` can hold at least 1 hash worth of trits.
+  for(incoming_count = PyList_Size(incoming); incoming_count < HASH_LENGTH; incoming_count++) {
+    PyList_Append(incoming, PyLong_FromLong(0));
+  }
 
   // Adapted from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
-  do {
-    // Can't use ``memcpy`` here because we have to convert ints into ``PyLongObject``.
-    // This isn't the slow part of Curl (that honor is reserved for ``_Curl_transform``),
-    // so it shouldn't be that big of a problem.
-    for (int i=offset; i < (incoming_count < HASH_LENGTH ? incoming_count : HASH_LENGTH ); i++) {
-      PyList_SetItem(incoming, i, PyLong_FromLong(self->_state[i]));
-    }
+  // Note that squeeze only copies one hash.
 
-    _Curl_transform(self);
-    offset += HASH_LENGTH;
-  } while ((incoming_count -= HASH_LENGTH) > 0);
+  // Can't use ``memcpy`` here because we have to convert ints into ``PyLongObject``.
+  // This isn't the slow part of Curl (that honor is reserved for ``_Curl_transform``),
+  // so it shouldn't be that big of a problem.
+  for (int i=0; i < HASH_LENGTH; i++) {
+    PyList_SetItem(incoming, i, PyLong_FromLong(self->_state[i]));
+  }
+
+  _Curl_transform(self);
 
   Py_INCREF(Py_None);
   return Py_None;
