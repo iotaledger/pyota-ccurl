@@ -4,8 +4,9 @@
 #define HASH_LENGTH 243
 #define STATE_LENGTH 3 * HASH_LENGTH
 
-// Define the size of a trit as 64 bits, so that we can compute 64 hashes in parallel.
-typedef int64_t trit_t;
+// 32-bit int uses more memory, but
+// CPUs are often optimized for 32- and 64-bit ints.
+typedef int32_t trit_t;
 
 typedef struct {
   PyObject_HEAD
@@ -28,7 +29,46 @@ Curl_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 static PyObject*
 Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
 {
-  /* Not implemented yet. */
+  PyObject *incoming, *incoming_item;
+  int32_t i, incoming_count;
+  trit_t incoming_value;
+  trit_t *trits;
+
+  static char *kwlist[] = {"trits"};
+
+  // Extract and validate parameters.
+  // https://github.com/alfredch/iotaPy-Extension/blob/master/iotaPy.c
+  if (! PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &incoming))
+    return NULL;
+
+  if (! PySequence_Check(incoming)) {
+    PyErr_SetString(PyExc_TypeError, "Expected list of integers.");
+    return NULL;
+  }
+
+  // Check for invalid values in ``incoming``.
+  incoming_count = PyObject_Length(incoming);
+  trits = (trit_t*)malloc(incoming_count * sizeof(trit_t));
+
+  for (i=0; i < incoming_count; i++) {
+    incoming_item = PySequence_GetItem(incoming, i);
+
+    if ((incoming_item == NULL) || ! PyLong_Check(incoming_item)) {
+      PyErr_SetString(PyExc_ValueError, "List contains non-numeric values.");
+      return NULL;
+    }
+
+    incoming_value = (trit_t)PyLong_AsLong(incoming_item);
+    if ((incoming_value < -1) || (incoming_value > 1)) {
+      PyErr_SetString(PyExc_ValueError, "List contains value outside range [-1, 1].");
+      return NULL;
+    }
+
+    trits[i] = incoming_value;
+  }
+
+  // @todo Copy values to state and transform.
+
   Py_INCREF(Py_None);
   return Py_None;
 }
