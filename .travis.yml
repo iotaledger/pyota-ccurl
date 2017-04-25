@@ -5,9 +5,9 @@ python:
 install: pip install .
 script:
   - pip install nose mock
-  - 'pip download --no-deps --no-binary :all: --dest pyota --pre pyota'
-  - tar -zxf pyota/PyOTA-*.tar.gz -C pyota --strip-components=1
-  - nosetests pyota/test
+  - 'pip download --no-deps --no-binary :all: --dest pyota-unittests --pre pyota'
+  - tar -zxf pyota-unittests/PyOTA-*.tar.gz -C pyota-unittests --strip-components=1
+  - nosetests pyota-unittests/test
 deploy:
   on:
     branch: master
