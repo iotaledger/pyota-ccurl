@@ -1,3 +1,6 @@
+# PyOTA unit tests
+/pyota-unittests/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
