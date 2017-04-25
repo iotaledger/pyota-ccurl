@@ -3,7 +3,11 @@ python:
   - '3.5'
   - '3.6'
 install: pip install .
-script: python setup.py test
+script:
+  - pip install nose mock
+  - 'pip download --no-deps --no-binary :all: --dest pyota --pre pyota'
+  - tar -zxf pyota/PyOTA-*.tar.gz -C pyota --strip-components=1
+  - nosetests pyota/test
 deploy:
   on:
     branch: master
