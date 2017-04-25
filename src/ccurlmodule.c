@@ -5,9 +5,10 @@
 #define NUMBER_OF_ROUNDS 27
 #define STATE_LENGTH 3 * HASH_LENGTH
 
-// 32-bit int uses more memory, but
-// CPUs are often optimized for 32- and 64-bit ints.
-typedef int32_t trit_t;
+// For consistency with the Curl c library, each trit gets 64 bits.
+// In future versions of the software, this will yield significant
+// speedups because we can compute multiple hashes concurrently.
+typedef int64_t trit_t;
 
 // Copied from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
 #define __TRUTH_TABLE	\
