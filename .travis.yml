@@ -4,7 +4,7 @@ python:
   - '3.6'
 install: pip install .
 script:
-  - pip download --no-binary :all: --no-deps --pre --dest pyota pyota
+  - 'pip download --no-binary :all: --no-deps --pre --dest pyota pyota'
   - nosetests pyota/test
 deploy:
   on:
