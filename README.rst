@@ -1,8 +1,5 @@
 C Curl Extension for PyOTA
 ==========================
-.. DANGER::
-   ⚠️ **THIS VERSION IS EXPERIMENTAL AND HAS NOT BEEN VETTED FOR STABILITY/SECURITY YET; DO NOT USE IN PRODUCTION CODE!!!** ⚠️
-
 This is an extension for the crypto functionality in `PyOTA <https://pypi.python.org/pypi/PyOTA>`_, the Python API
 for IOTA.  When installed, it will significantly boost the performance of
 PyOTA's crypto functionality.
@@ -19,7 +16,7 @@ This extension is currently compatible with Python 3.6 and 3.5 only.
 Adding Python 2 support is on my list, but it may take me a bit before I can get to it.
 
 If you have experience with C and are interested in getting involved,
-please reach out to me on the `IOTA Slack network <https://iotatangle.slack.com/>`_ or submit a pull request.
+please reach out to me on the `IOTA Slack network <https://slack.iota.org/>`_ or submit a pull request.
 
 Testing
 -------
