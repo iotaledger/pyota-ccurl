@@ -103,6 +103,8 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
     offset += HASH_LENGTH;
   } while ((incoming_count -= HASH_LENGTH) > 0);
 
+  free(trits);
+
   Py_INCREF(Py_None);
   return Py_None;
 }
