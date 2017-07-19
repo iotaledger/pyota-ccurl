@@ -6,15 +6,14 @@ python:
 install: pip install .
 script:
   - pip install nose mock
-  - 'if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then mkdir pyota-unittests && pip install --no-deps --no-use-wheel --download pyota-unittests --pre pyota; fi'
-  - 'if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pip download --no-deps --no-binary :all: --dest pyota-unittests --pre pyota; fi'
+  - 'pip download --no-deps --no-binary :all: --dest pyota-unittests --pre pyota'
   - tar -zxf pyota-unittests/PyOTA-*.tar.gz -C pyota-unittests --strip-components=1
   - nosetests pyota-unittests/test
 deploy:
   on:
     branch: master
   provider: pypi
-  distribution: sdist bdist_wheel
+  distribution: bdist_wheel sdist
   skip_upload_docs: true
   user: phx
   password:
