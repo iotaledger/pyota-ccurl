@@ -1,11 +1,13 @@
 language: python
 python:
+  - '2.7'
   - '3.5'
   - '3.6'
 install: pip install .
 script:
   - pip install nose mock
-  - 'pip download --no-deps --no-binary :all: --dest pyota-unittests --pre pyota'
+  - 'if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then mkdir pyota-unittests && pip install --no-deps --no-use-wheel --download pyota-unittests --pre pyota; fi'
+  - 'if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pip download --no-deps --no-binary :all: --dest pyota-unittests --pre pyota; fi'
   - tar -zxf pyota-unittests/PyOTA-*.tar.gz -C pyota-unittests --strip-components=1
   - nosetests pyota-unittests/test
 deploy:

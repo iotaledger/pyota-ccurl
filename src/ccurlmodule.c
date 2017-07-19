@@ -5,6 +5,24 @@
 #define NUMBER_OF_ROUNDS 27
 #define STATE_LENGTH 3 * HASH_LENGTH
 
+
+#if PY_MAJOR_VERSION >= 3
+
+#define PYTRIT_CHECK PyLong_Check
+#define PYTRIT_AS_LONG PyLong_AsLong
+#define PYTRIT_FROM_LONG PyLong_FromLong
+#define INITERROR return NULL
+
+#else
+
+#define PYTRIT_CHECK PyInt_Check
+#define PYTRIT_AS_LONG PyInt_AsLong
+#define PYTRIT_FROM_LONG PyInt_FromLong
+#define INITERROR return
+
+#endif
+
+
 // For consistency with the Curl c library, each trit gets 64 bits.
 // In future versions of the software, this will yield significant
 // speedups because we can compute multiple hashes concurrently.
@@ -81,12 +99,12 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
   for (i=0; i < incoming_count; i++) {
     incoming_item = PyList_GetItem(incoming, i);
 
-    if ((incoming_item == NULL) || ! PyLong_Check(incoming_item)) {
+    if ((incoming_item == NULL) || ! PYTRIT_CHECK(incoming_item)) {
       PyErr_Format(PyExc_ValueError, "`trits` argument contains non-numeric value at index %u.", i);
       return NULL;
     }
 
-    incoming_value = (trit_t)PyLong_AsLong(incoming_item);
+    incoming_value = (trit_t)PYTRIT_AS_LONG(incoming_item);
     if ((incoming_value < -1) || (incoming_value > 1)) {
       PyErr_Format(PyExc_ValueError, "`trits` argument contains value outside range [-1, 1] at index %u.", i);
       return NULL;
@@ -128,7 +146,7 @@ Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 
   // Ensure that ``incoming`` can hold at least 1 hash worth of trits.
   for(incoming_count = PyList_Size(incoming); incoming_count < HASH_LENGTH; incoming_count++) {
-    PyList_Append(incoming, PyLong_FromLong(0));
+    PyList_Append(incoming, PYTRIT_FROM_LONG(0));
   }
 
   // Adapted from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
@@ -138,7 +156,7 @@ Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
   // This isn't the slow part of Curl (that honor is reserved for ``_Curl_transform``),
   // so it shouldn't be that big of a problem.
   for (i=0; i < HASH_LENGTH; i++) {
-    PyList_SetItem(incoming, i, PyLong_FromLong(self->_state[i]));
+    PyList_SetItem(incoming, i, PYTRIT_FROM_LONG(self->_state[i]));
   }
 
   _Curl_transform(self);
@@ -204,6 +222,8 @@ static PyTypeObject ccurl_CurlType = {
   Curl_new,           /* tp_new */
 };
 
+#if PY_MAJOR_VERSION >= 3
+
 static PyModuleDef ccurlmodule = {
   PyModuleDef_HEAD_INIT,
   "ccurl",
@@ -214,29 +234,43 @@ static PyModuleDef ccurlmodule = {
 
 PyMODINIT_FUNC
 PyInit_ccurl(void)
+
+#else
+
+void
+initccurl(void)
+
+#endif
 {
-  PyObject *m, *hash_length;
+  PyObject *hash_length;
+
+#if PY_MAJOR_VERSION >= 3
+  PyObject *module = PyModule_Create(&ccurlmodule);
+#else
+  PyObject *module = Py_InitModule("ccurl", Curl_methods);
+#endif
+
+  if (module == NULL)
+    INITERROR;
 
   ccurl_CurlType.tp_new = PyType_GenericNew;
   if (PyType_Ready(&ccurl_CurlType) < 0)
-    return NULL;
-
-  m = PyModule_Create(&ccurlmodule);
-  if (m == NULL)
-    return NULL;
+    INITERROR;
 
   hash_length = Py_BuildValue("i", HASH_LENGTH);
   if (hash_length == NULL)
-    return NULL;
+    INITERROR;
 
   // Define module-level symbols, named for compatibility with
   // pycurl module in PyOTA library.
   Py_INCREF(&ccurl_CurlType);
-  PyModule_AddObject(m, "Curl", (PyObject*)&ccurl_CurlType);
+  PyModule_AddObject(module, "Curl", (PyObject*)&ccurl_CurlType);
 
   Py_INCREF(hash_length);
-  PyModule_AddObject(m, "HASH_LENGTH", hash_length);
+  PyModule_AddObject(module, "HASH_LENGTH", hash_length);
 
-  return m;
+#if PY_MAJOR_VERSION >= 3
+  return module;
+#endif
 }
 
