@@ -10,13 +10,7 @@ This extension is installed as an add-on to the ``pyota`` package::
 
 Compatibility
 -------------
-This extension is currently compatible with Python 3.6 and 3.5 only.
-
-`I've documented the issues with the Python 2 C API <https://github.com/todofixthis/pyota-ccurl/issues/4>`_.
-Adding Python 2 support is on my list, but it may take me a bit before I can get to it.
-
-If you have experience with C and are interested in getting involved,
-please reach out to me on the `IOTA Slack network <https://slack.iota.org/>`_ or submit a pull request.
+This extension is compatible with Python 3.6, 3.5 and 2.7.
 
 Testing
 -------
