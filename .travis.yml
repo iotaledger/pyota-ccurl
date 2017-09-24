@@ -4,7 +4,7 @@ python:
   - '2.7'
   - '3.5'
   - '3.6'
-install: pip install .
+install: pip install --pre .
 script:
   - pip install nose mock
   - 'pip download --no-deps --no-binary :all: --dest pyota-unittests --pre pyota'
@@ -12,9 +12,9 @@ script:
   - nosetests pyota-unittests/test
 deploy:
   on:
-    branch: master
+    tags: true
   provider: pypi
-  distribution: bdist_wheel sdist
+  distributions: 'bdist_wheel sdist'
   skip_upload_docs: true
   user: phx
   password:

@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 #define HASH_LENGTH 243
-#define NUMBER_OF_ROUNDS 27
+#define NUMBER_OF_ROUNDS 81
 #define STATE_LENGTH 3 * HASH_LENGTH
 
 
