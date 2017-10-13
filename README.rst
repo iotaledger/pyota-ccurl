@@ -9,7 +9,7 @@ This extension is installed as an add-on to the ``pyota`` package::
    pip install pyota[ccurl]
 
 After running the above command, you can verify that the C extension is
-installed correctly by running the ``check_ccurl`` command::
+installed correctly by running the ``check_ccurl`` command in your shell::
 
    > check_ccurl
    😸  CCurl is installed correctly!
