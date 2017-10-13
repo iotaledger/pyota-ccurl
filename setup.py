@@ -21,7 +21,7 @@ setup(
 
   long_description = long_description,
 
-  packages = ['pyota_ccurl'],
+  py_modules = ['pyota_ccurl'],
   ext_modules = [Extension('ccurl', ['src/ccurlmodule.c'])],
 
   entry_points = {
