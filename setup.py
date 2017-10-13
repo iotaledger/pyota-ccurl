@@ -17,7 +17,7 @@ setup(
   name        = 'PyOTA-CCurl',
   description = 'C Curl extension for PyOTA',
   url         = 'https://github.com/todofixthis/pyota-ccurl',
-  version     = '1.0.5',
+  version     = '1.0.6',
 
   long_description = long_description,
 
