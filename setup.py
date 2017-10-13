@@ -21,7 +21,14 @@ setup(
 
   long_description = long_description,
 
+  packages = ['pyota_ccurl'],
   ext_modules = [Extension('ccurl', ['src/ccurlmodule.c'])],
+
+  entry_points = {
+    'console_scripts': [
+      'check_ccurl = pyota_ccurl:check_installation',
+    ],
+  },
 
   install_requires = ['pyota'],
 
