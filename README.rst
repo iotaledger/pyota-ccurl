@@ -8,6 +8,14 @@ This extension is installed as an add-on to the ``pyota`` package::
 
    pip install pyota[ccurl]
 
+After running the above command, you can verify that the C extension is
+installed correctly by running the ``check_ccurl`` command::
+
+   > check_ccurl
+   😸  CCurl is installed correctly!
+   For support, visit the #iota-libs-pyota channel on the IOTA Slack.
+   https://slack.iota.org/
+
 Compatibility
 -------------
 This extension is compatible with Python 3.6, 3.5 and 2.7.
