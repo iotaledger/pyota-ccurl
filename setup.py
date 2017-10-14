@@ -17,7 +17,7 @@ setup(
   name        = 'PyOTA-CCurl',
   description = 'C Curl extension for PyOTA',
   url         = 'https://github.com/todofixthis/pyota-ccurl',
-  version     = '1.0.7',
+  version     = '1.0.8',
 
   long_description = long_description,
 
@@ -31,6 +31,10 @@ setup(
   },
 
   install_requires = ['pyota'],
+
+  tests_require = ['nose'],
+  test_suite    = 'test',
+  test_loader   = 'nose.loader:TestLoader',
 
   license = 'MIT',
 
