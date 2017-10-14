@@ -32,6 +32,10 @@ setup(
 
   install_requires = ['pyota'],
 
+  tests_require = ['nose'],
+  test_suite    = 'test',
+  test_loader   = 'nose.loader:TestLoader',
+
   license = 'MIT',
 
   classifiers = [
