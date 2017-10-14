@@ -17,11 +17,11 @@ setup(
   name        = 'PyOTA-CCurl',
   description = 'C Curl extension for PyOTA',
   url         = 'https://github.com/todofixthis/pyota-ccurl',
-  version     = '1.0.6',
+  version     = '1.0.7',
 
   long_description = long_description,
 
-  packages = ['pyota_ccurl'],
+  py_modules = ['pyota_ccurl'],
   ext_modules = [Extension('ccurl', ['src/ccurlmodule.c'])],
 
   entry_points = {
