@@ -4,8 +4,15 @@ python:
   - '2.7'
   - '3.5'
   - '3.6'
-install: pip install --pre .
+
+install:
+  - pip install --pre .
+  - pip install docutils  # Used to check package metadata.
+
 script:
+  # Check package metadata.
+  - python setup.py check --strict --metadata --restructuredtext
+
   # Run local unit tests.
   - python setup.py test
 
@@ -15,6 +22,7 @@ script:
   - 'pip download --no-deps --no-binary :all: --dest pyota-unittests --pre pyota'
   - tar -zxf pyota-unittests/PyOTA-*.tar.gz -C pyota-unittests --strip-components=1
   - nosetests pyota-unittests/test
+
 deploy:
   # Ensure a source distribution gets published, even if wheels fail.
   - on:
