@@ -29,5 +29,5 @@ def check_installation():
       if is_installed()
       else 'Aww, man! CCurl is NOT installed correctly!'
   )
-  print('For support, visit the #iota-libs-pyota channel on the IOTA Slack.')
-  print('https://slack.iota.org/')
+  print('For support, visit the #python channel on the IOTA Discord.')
+  print('https://discordapp.com/invite/yxve4wu')
